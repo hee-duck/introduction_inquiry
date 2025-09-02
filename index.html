@@ -195,6 +195,46 @@
       border-radius: 12px;
     }
 
+    /* 선택형(칩) — 폼 톤에 맞춤, 비차단 영역 */
+    .optional-block {
+      margin-top: 10px;
+    }
+
+    .linklike {
+      appearance: none;
+      background: transparent;
+      border: 0;
+      color: #0f172a;
+      font-size: 13px;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: #374151;
+      background: #fff;
+    }
+
+    .chip input {
+      margin: 0;
+    }
+
+
     /* 개인정보 수집 동의 블록 — 전체 톤 맞춤 */
     .counsel-agree {
       margin-top: 16px;
@@ -234,7 +274,8 @@
     .counsel-agree .form-check-input {
       width: 16px;
       height: 16px;
-      margin: 0;    }
+      margin: 0;
+    }
 
     .counsel-agree .form-check-label {
       font-size: 13px;
@@ -339,6 +380,29 @@
         <div id="step1_5_title" class="subtitle">선택한 서비스를 확인해주세요.</div>
         <div class="card" style="border:1px dashed #cbd5e1; background:#f8fafc;">
           <div id="confirmText" style="font-size:16px; font-weight:600;">…</div>
+
+          <!-- 1.5단계: 추가 관심 서비스 (선택, 비차단) -->
+          <div id="extraInterest" class="optional-block">
+            <button type="button" id="toggleExtra" class="linklike" style="color: cornflowerblue;">다른 서비스도 관심 있어요</button>
+            <div id="extraBox" class="hidden" aria-hidden="true">
+              <div class="chip-group" id="extraChips">
+                <label class="chip">
+                  <input type="checkbox" name="also_bizmessage" value="Y"> 비즈메시지
+                </label>
+                <label class="chip">
+                  <input type="checkbox" name="also_chatbot" value="Y"> 챗봇
+                </label>
+                <label class="chip">
+                  <input type="checkbox" name="also_signup" value="Y"> 간편가입
+                </label>
+                <label class="chip">
+                  <input type="checkbox" name="also_bizting" value="Y"> 비즈팅
+                </label>
+              </div>
+              <div class="help">선택하지 않아도 바로 다음 단계로 진행할 수 있어요.</div>
+            </div>
+          </div>
+
           <div class="hint">잘못 선택하셨다면 ‘변경하기’를 눌러주세요.</div>
         </div>
         <div class="btns">
@@ -603,6 +667,35 @@
         }
         el.confirmText.innerHTML = html;
         show(el.step1_5);
+
+        // 1.5단계: 추가 관심 서비스 칩 세팅 (현재 선택 서비스는 숨김)
+        (function setupExtraInterest() {
+          const svc = currentServiceValue();
+          const map = {
+            bizmessage: 'also_bizmessage',
+            chatbot: 'also_chatbot',
+            signup: 'also_signup',
+            bizting: 'also_bizting'
+          };
+          // 박스 초기화/숨김
+          const box = document.getElementById('extraBox');
+          if (box) { box.classList.add('hidden'); box.setAttribute('aria-hidden', 'true'); }
+
+          // 현재 선택 서비스 칩 숨김, 나머지 노출
+          const targetName = map[svc];
+          document.querySelectorAll('#extraChips .chip').forEach(lbl => {
+            const cb = lbl.querySelector('input[type="checkbox"]');
+            if (!cb) return;
+            // 자기 자신(현재 선택 서비스)은 숨김 + 체크 해제
+            if (cb.name === targetName) {
+              lbl.style.display = 'none';
+              cb.checked = false;
+            } else {
+              lbl.style.display = 'inline-flex';
+            }
+          });
+        })();
+
       }
 
       function toStep2() { show(el.step2); }
@@ -617,6 +710,11 @@
         data.has_api_dev = formData.get('has_api_dev') || '';
         data.agreeChk = formData.get('agreeChk') || '';
         data.elapsed_ms = Date.now() - startTs;
+        data.also_bizmessage = (formData.get('also_bizmessage') ? 'Y' : 'N');
+        data.also_chatbot = (formData.get('also_chatbot') ? 'Y' : 'N');
+        data.also_signup = (formData.get('also_signup') ? 'Y' : 'N');
+        data.also_bizting = (formData.get('also_bizting') ? 'Y' : 'N');
+
         return data;
       }
 
@@ -673,6 +771,18 @@
       el.email.addEventListener('input', syncContactValidation);
       el.phone.addEventListener('input', syncContactValidation);
       el.form.addEventListener('submit', submit);
+
+      // 1.5단계: ‘다른 서비스도 관심 있어요’ 토글
+      const toggleExtraBtn = document.getElementById('toggleExtra');
+      if (toggleExtraBtn) {
+        toggleExtraBtn.addEventListener('click', () => {
+          const box = document.getElementById('extraBox');
+          const isHidden = box.classList.contains('hidden');
+          box.classList.toggle('hidden', !isHidden);
+          box.setAttribute('aria-hidden', String(!isHidden));
+        });
+      }
+
 
       // 비즈메시지 개발자 보유 여부 변경 시 즉시 검증
       Array.from(document.querySelectorAll('input[name="has_api_dev"]'))
