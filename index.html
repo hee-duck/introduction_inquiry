@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>비즈톡 도입문의 개선(v2.0)</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --text: #111827;
+      --brand: #334155;
+      --accent: #111827;
+      --border: #e5e7eb;
+      --radius: 16px;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 32px auto;
+      padding: 0 16px 42px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(2, 6, 23, .04);
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    fieldset {
+      border: 0;
+      padding: 0;
+      margin: 0;
+    }
+
+    legend {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .radio-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .radio-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .radio-item:hover {
+      border-color: #cbd5e1;
+      background: #f9fafb;
+    }
+
+    .radio-item input {
+      margin-top: 3px;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: #374151;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row.single {
+      grid-template-columns: 1fr;
+    }
+
+    label {
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      width: 80%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 3px rgba(148, 163, 184, .2);
+    }
+
+    .help {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    .error {
+      font-size: 12px;
+      color: #b91c1c;
+      margin-top: 6px;
+    }
+
+    .btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid #0f172a;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .success {
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    /* 개인정보 수집 동의 블록 — 전체 톤 맞춤 */
+    .counsel-agree {
+      margin-top: 16px;
+    }
+
+    .counsel-agree h5 {
+      font-size: 16px;
+      /* 본문 타이틀 톤 */
+      font-weight: 700;
+      margin: 14px 0 8px;
+      color: #111827;
+    }
+
+    .counsel-agree .form-control {
+      font-size: 13px;
+      /* 본문 텍스트 톤 */
+      color: #374151;
+      line-height: 1.6;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    /* 라디오 가로 정렬 + 간격 */
+    .counsel-agree .d-flex.fs-6.justify-content-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      /* 입력/라벨 간 간격 */
+      flex-wrap: wrap;
+      /* 화면 좁을 때 자연스럽게 줄바꿈 */
+      margin-top: 10px;
+    }
+
+    .counsel-agree .form-check-input {
+      width: 16px;
+      height: 16px;
+      margin: 0;    }
+
+    .counsel-agree .form-check-label {
+      font-size: 13px;
+      /* 폼 라벨 톤 */
+      color: #374151;
+    }
+
+    /* 두 라디오 그룹 간 적정 간격 (input#radio1 뒤 라벨까지 하나의 그룹으로 보고 우측 여백 부여) */
+    .counsel-agree #radio1+label {
+      margin-right: 16px;
+    }
+
+    /* 일부 프레임워크(ms-3) 영향 중화: 두 번째 라디오의 좌측 여백을 통일 */
+    .counsel-agree #radio2 {
+      margin-left: 0;
+    }
+
+    @media (max-width: 480px) {
+      .counsel-agree .d-flex.fs-6.justify-content-center {
+        gap: 8px;
+      }
+    }
+
+    @media (max-width:720px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="title">도입문의</div>
+    <div class="subtitle">서비스를 선택하고, 연락처만 남기면 상담이 진행됩니다.</div>
+
+    <form id="leadForm" class="card" novalidate>
+      <!-- 숨김(봇 방지: 허니팟) -->
+      <div class="hidden" aria-hidden="true">
+        <label for="hp_website">웹사이트</label>
+        <input type="text" id="hp_website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <!-- step 1: 서비스 선택 -->
+      <section id="step1" class="step active" aria-labelledby="step1_title">
+        <fieldset>
+          <legend id="step1_title">문의하실 서비스를 선택해주세요.</legend>
+          <div class="radio-list" role="radiogroup" aria-label="서비스 선택">
+            <label class="radio-item">
+              <input type="radio" name="service" value="bizmessage" />
+              <div><strong>비즈메시지</strong> — 카카오 알림톡/브랜드 메시지/문자/네이버 메시지 발송</div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="service" value="chatbot" />
+              <div><strong>챗봇</strong> — 주문·배송·환불·서비스 안내 등 자동응답</div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="service" value="signup" />
+              <div><strong>간편가입</strong> — 카카오싱크/네이버 로그인 연동</div>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="service" value="bizting" />
+              <div><strong>비즈팅</strong> — 통신사/카드사/포인트사 회원 정보 기반 신규 고객 유치용 타겟 광고 문자 발송</div>
+            </label>
+          </div>
+
+          <!-- 비즈메시지 선택 시에만 노출되는 개발자 보유 여부 -->
+          <div id="bizmessageDev" class="hidden" style="margin-top:12px;">
+            <div class="desc"><strong>필수</strong> — 시스템(API) 연동 가능한 개발자가 있나요?</div>
+            <div class="row single" style="margin-top:8px;">
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="radio" name="has_api_dev" value="Y" /> 있습니다
+              </label>
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="radio" name="has_api_dev" value="N" /> 없습니다
+              </label>
+            </div>
+          </div>
+
+          <!-- 비즈팅 선택 시에만 노출되는 관심사 (선택) -->
+          <div id="biztingOptions" class="hidden" style="margin-top:12px;">
+            <div class="desc"><strong>선택</strong> — 지금 당장 필요하지 않으면 넘어가셔도 됩니다.</div>
+            <div class="row single" style="margin-top:8px;">
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" name="interest_sports" value="Y" /> 스포츠 경기장 마케팅
+              </label>
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" name="interest_onboard" value="Y" /> 온보드 마케팅
+              </label>
+            </div>
+          </div>
+
+          <div id="step1_error" class="error" aria-live="polite"></div>
+          <div class="btns">
+            <button type="button" id="toStep1_5" class="btn" disabled>다음</button>
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- step 1.5: 선택 서비스 확인 -->
+      <section id="step1_5" class="step" aria-labelledby="step1_5_title">
+        <div id="step1_5_title" class="subtitle">선택한 서비스를 확인해주세요.</div>
+        <div class="card" style="border:1px dashed #cbd5e1; background:#f8fafc;">
+          <div id="confirmText" style="font-size:16px; font-weight:600;">…</div>
+          <div class="hint">잘못 선택하셨다면 ‘변경하기’를 눌러주세요.</div>
+        </div>
+        <div class="btns">
+          <button type="button" id="backToStep1" class="btn secondary">변경하기</button>
+          <button type="button" id="toStep2" class="btn">다음</button>
+        </div>
+      </section>
+
+      <!-- step 2: 연락처 입력 -->
+      <section id="step2" class="step" aria-labelledby="step2_title">
+        <fieldset>
+          <legend id="step2_title">서비스를 제안받을 연락처를 입력해주세요.</legend>
+          <div class="row">
+            <div>
+              <label for="name">이름</label>
+              <input id="name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div>
+              <label for="company">회사</label>
+              <input id="company" name="company" type="text" autocomplete="organization" required />
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px;">
+            <div>
+              <label for="email">이메일 <span class="help">(업무용 권장)</span></label>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required />
+              <div id="email_error" class="error" aria-live="polite"></div>
+            </div>
+            <div>
+              <label for="phone">연락처</label>
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+              <div id="phone_error" class="error" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="row single" style="margin-top:12px;">
+            <div>
+              <label for="note">추가 문의 사항 <span class="help">(선택)</span></label>
+              <textarea id="note" name="note" rows="4" placeholder="있다면 간단히 남겨주세요."></textarea>
+            </div>
+          </div>
+
+          <!-- 숨김값(트래킹/컨텍스트) -->
+          <input type="hidden" name="selected_service" id="selected_service" />
+          <input type="hidden" name="utm_source" id="utm_source" />
+          <input type="hidden" name="utm_medium" id="utm_medium" />
+          <input type="hidden" name="utm_campaign" id="utm_campaign" />
+          <input type="hidden" name="utm_term" id="utm_term" />
+          <input type="hidden" name="utm_content" id="utm_content" />
+          <input type="hidden" name="referrer" id="referrer" />
+          <input type="hidden" name="landing_path" id="landing_path" />
+
+          <!-- 개인정보 수집 동의 -->
+          <div class="counsel-agree mb-5">
+            <h5>개인정보 수집 동의</h5>
+            <p class="form-control">
+              ■ 비즈톡에서 제공하는 서비스를 원활히 제공받기 위하여, 아래와 같이 개인정보의 수집 및 이용에 동의합니다.<br><br>
+              <strong>1. 수집 항목:</strong> 이름, 연락처, 이메일, 상담 내용, 첨부파일<br>
+              <strong>2. 수집 및 이용 목적:</strong> 비즈톡 상담 신청 접수 및 처리<br>
+              <strong>3. 보유 및 이용 기간:</strong> 접수 완료일로부터 90일간 보관 후 파기<br>
+              <strong>4. 동의 거부 권리 및 불이익:</strong> 귀하는 개인정보 수집·이용에 대한 동의를 거부하실 권리가 있으며, 다만 동의하지 않으실 경우 온라인 상담 신청이 제한될 수
+              있습니다.<br>
+            </p>
+            <div class="d-flex fs-6 justify-content-center">
+              <input class="form-check-input" type="radio" value="Y" name="agreeChk" id="radio1">
+              <label class="form-check-label ms-2" for="radio1">동의합니다</label>
+              <input class="form-check-input ms-3" type="radio" value="N" name="agreeChk" id="radio2">
+              <label class="form-check-label ms-2" for="radio2">동의하지 않습니다</label>
+            </div>
+          </div>
+
+          <button type="button" id="backToStep1_5" class="btn secondary">이전</button>
+          <button type="submit" id="submitBtn" class="btn">제출하기</button>
+  </div>
+  <div id="submit_error" class="error" style="margin-top:8px;"></div>
+  </fieldset>
+  </section>
+
+  <!-- 완료 -->
+  <section id="done" class="step" aria-live="polite">
+    <div class="success">
+      <strong>접수되었습니다.</strong>
+      <div class="hint">담당자가 확인 후 연락드리겠습니다. 감사합니다.</div>
+    </div>
+  </section>
+  </form>
+  </div>
+
+  <script>
+    (function () {
+      const SERVICES = {
+        bizmessage: '비즈메시지',
+        chatbot: '챗봇',
+        signup: '간편가입',
+        bizting: '비즈팅'
+      };
+
+      const SERVICE_DESC = {
+        bizmessage: '카카오 알림톡/브랜드 메시지/문자/네이버 메시지 발송',
+        chatbot: '주문·배송·환불·서비스 안내 등 자동응답',
+        signup: '카카오싱크/네이버 로그인 연동',
+        bizting: '통신사/카드사/포인트사 회원 정보 기반 신규 고객 유치용 타겟 광고 문자 발송'
+      };
+
+      const el = {
+        form: document.getElementById('leadForm'),
+        step1: document.getElementById('step1'),
+        step1_5: document.getElementById('step1_5'),
+        step2: document.getElementById('step2'),
+        done: document.getElementById('done'),
+        serviceRadios: Array.from(document.querySelectorAll('input[name="service"]')),
+        biztingOptions: document.getElementById('biztingOptions'),
+        bizmessageDev: document.getElementById('bizmessageDev'),
+        toStep1_5: document.getElementById('toStep1_5'),
+        backToStep1: document.getElementById('backToStep1'),
+        toStep2: document.getElementById('toStep2'),
+        backToStep1_5: document.getElementById('backToStep1_5'),
+        confirmText: document.getElementById('confirmText'),
+        step1_error: document.getElementById('step1_error'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone'),
+        email_error: document.getElementById('email_error'),
+        phone_error: document.getElementById('phone_error'),
+        submit_error: document.getElementById('submit_error'),
+        submitBtn: document.getElementById('submitBtn'),
+        selected_service: document.getElementById('selected_service'),
+        utm: {
+          source: document.getElementById('utm_source'),
+          medium: document.getElementById('utm_medium'),
+          campaign: document.getElementById('utm_campaign'),
+          term: document.getElementById('utm_term'),
+          content: document.getElementById('utm_content'),
+        },
+        referrer: document.getElementById('referrer'),
+        landing: document.getElementById('landing_path'),
+        hp: document.getElementById('hp_website')
+      };
+
+      const startTs = Date.now();
+
+      function show(step) {
+        [el.step1, el.step1_5, el.step2, el.done].forEach(s => s.classList.remove('active'));
+        step.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function currentServiceValue() {
+        const r = el.serviceRadios.find(x => x.checked);
+        return r ? r.value : '';
+      }
+
+      function currentServiceLabel() {
+        const v = currentServiceValue();
+        return SERVICES[v] || '';
+      }
+
+      function updateBiztingOptions() {
+        const v = currentServiceValue();
+        const isBizting = v === 'bizting';
+        const isBizmsg = v === 'bizmessage';
+
+        // 비즈팅 하위 옵션 토글
+        el.biztingOptions.classList.toggle('hidden', !isBizting);
+        if (!isBizting) {
+          const cb1 = document.querySelector('input[name="interest_sports"]');
+          const cb2 = document.querySelector('input[name="interest_onboard"]');
+          if (cb1) cb1.checked = false;
+          if (cb2) cb2.checked = false;
+        }
+
+        // 비즈메시지: 개발자 보유 여부 토글
+        el.bizmessageDev.classList.toggle('hidden', !isBizmsg);
+        if (!isBizmsg) {
+          const d1 = document.querySelector('input[name="has_api_dev"][value="Y"]');
+          const d2 = document.querySelector('input[name="has_api_dev"][value="N"]');
+          if (d1) d1.checked = false;
+          if (d2) d2.checked = false;
+        }
+      }
+
+      function validateStep1() {
+        const svc = currentServiceValue();
+        let ok = !!svc;
+        let msg = '';
+        if (!ok) {
+          msg = '서비스를 선택해 주세요.';
+        } else if (svc === 'bizmessage') {
+          const dev = document.querySelector('input[name="has_api_dev"]:checked');
+          if (!dev) { ok = false; msg = '개발자 보유 여부를 선택해 주세요.'; }
+        }
+        el.toStep1_5.disabled = !ok;
+        el.step1_error.textContent = ok ? '' : msg;
+        return ok;
+      }
+
+      function setDefaultFromUTM() {
+        const p = new URLSearchParams(location.search);
+        const utm_campaign = (p.get('utm_campaign') || '').toLowerCase();
+        const utm_source = p.get('utm_source') || '';
+        const utm_medium = p.get('utm_medium') || '';
+        const utm_term = p.get('utm_term') || '';
+        const utm_content = p.get('utm_content') || '';
+
+        // 채널 정보 저장
+        el.utm.campaign.value = utm_campaign;
+        el.utm.source.value = utm_source;
+        el.utm.medium.value = utm_medium;
+        el.utm.term.value = utm_term;
+        el.utm.content.value = utm_content;
+
+        // 기본 선택 제안 (사용자는 언제든 변경 가능)
+        const map = { chatbot: 'chatbot', signup: 'signup', bizmessage: 'bizmessage', bizting: 'bizting' };
+        const suggest = map[utm_campaign];
+        if (suggest) {
+          const target = el.serviceRadios.find(r => r.value === suggest);
+          if (target) { target.checked = true; updateBiztingOptions(); validateStep1(); }
+        }
+
+        // 트래킹 보조
+        el.referrer.value = document.referrer || '';
+        el.landing.value = location.pathname + location.search;
+      }
+
+      function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+      function validatePhone(v) {
+        const t = v.replace(/[^0-9]/g, '');
+        return t.length >= 9 && t.length <= 13;
+      }
+
+      function syncContactValidation() {
+        const e = el.email.value.trim();
+        el.email_error.textContent = (e && !validateEmail(e)) ? '이메일 형식을 확인해 주세요.' : '';
+        const p = el.phone.value.trim();
+        el.phone_error.textContent = (p && !validatePhone(p)) ? '연락처 숫자(하이픈 포함 가능) 9~13자로 입력해 주세요.' : '';
+      }
+
+      function toStep1_5() {
+        if (!validateStep1()) return;
+        const svc = currentServiceValue();
+        const label = currentServiceLabel();
+        el.selected_service.value = svc;
+
+        const titleEl = document.getElementById('step1_5_title');
+        if (titleEl) titleEl.textContent = `${label} 서비스를 문의합니다.`;
+
+        let html = `<div style="font-size:16px; margin-bottom:6px;"><strong>${label}</strong> — ${SERVICE_DESC[svc] || ''}</div>`;
+        if (svc === 'bizting') {
+          const sports = document.querySelector('input[name="interest_sports"]')?.checked;
+          const onboard = document.querySelector('input[name="interest_onboard"]')?.checked;
+          const pretty = (v) => v ? 'O' : 'X';
+          html += '<div class="hint" style="margin-top:6px;">추가 선택</div>';
+          html += '<ul style="margin:6px 0 0 18px; padding:0;">'
+            + `<li>스포츠 경기장 마케팅: ${pretty(sports)}</li>`
+            + `<li>온보드 마케팅: ${pretty(onboard)}</li>`
+            + '</ul>';
+        }
+        if (svc === 'bizmessage') {
+          const dev = document.querySelector('input[name="has_api_dev"]:checked')?.value;
+          if (dev) {
+            html += `<div class="hint" style="margin-top:6px;">개발자 보유 여부: ${dev === 'Y' ? '있습니다' : '없습니다'}</div>`;
+          }
+        }
+        el.confirmText.innerHTML = html;
+        show(el.step1_5);
+      }
+
+      function toStep2() { show(el.step2); }
+      function backToStep1() { show(el.step1); }
+      function backToStep1_5() { show(el.step1_5); }
+
+      function serialize() {
+        const formData = new FormData(el.form);
+        const data = Object.fromEntries(formData.entries());
+        data.interest_sports = formData.get('interest_sports') ? 'Y' : 'N';
+        data.interest_onboard = formData.get('interest_onboard') ? 'Y' : 'N';
+        data.has_api_dev = formData.get('has_api_dev') || '';
+        data.agreeChk = formData.get('agreeChk') || '';
+        data.elapsed_ms = Date.now() - startTs;
+        return data;
+      }
+
+      async function submit(e) {
+        e.preventDefault();
+        el.submit_error.textContent = '';
+
+        // 봇/스팸 간단 차단: 허니팟, 제출 최소 시간(>=3초)
+        if (el.hp.value) { el.submit_error.textContent = '제출을 완료할 수 없습니다.'; return; }
+        if (Date.now() - startTs < 3000) { el.submit_error.textContent = '잠시 후 다시 시도해 주세요.'; return; }
+
+        // 기본 검증
+        const required = ['name', 'company', 'email', 'phone'];
+        for (const id of required) {
+          const v = (document.getElementById(id).value || '').trim();
+          if (!v) { document.getElementById(id).focus(); el.submit_error.textContent = '필수 항목을 입력해 주세요.'; return; }
+        }
+        if (!validateEmail(el.email.value.trim())) { el.email.focus(); el.submit_error.textContent = '이메일 형식을 확인해 주세요.'; return; }
+        if (!validatePhone(el.phone.value.trim())) { el.phone.focus(); el.submit_error.textContent = '연락처 형식을 확인해 주세요.'; return; }
+
+        // 개인정보 수집 동의 필수
+        const agree = (new FormData(el.form)).get('agreeChk');
+        if (agree !== 'Y') { el.submit_error.textContent = '개인정보 수집·이용에 동의해 주세요.'; return; }
+
+        el.submitBtn.disabled = true;
+
+        const payload = serialize();
+        const endpoint = document.body.getAttribute('data-biz-endpoint') || '/api/lead';
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('서버 응답 오류');
+          show(el.done);
+        } catch (err) {
+          console.error(err);
+          el.submit_error.textContent = '제출 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+          el.submitBtn.disabled = false;
+        }
+      }
+
+      // --- 이벤트 바인딩 ---
+      el.serviceRadios.forEach(r => r.addEventListener('change', () => {
+        updateBiztingOptions();
+        validateStep1();
+      }));
+      el.toStep1_5.addEventListener('click', toStep1_5);
+      el.backToStep1.addEventListener('click', backToStep1);
+      el.toStep2.addEventListener('click', toStep2);
+      el.backToStep1_5.addEventListener('click', backToStep1_5);
+      el.email.addEventListener('input', syncContactValidation);
+      el.phone.addEventListener('input', syncContactValidation);
+      el.form.addEventListener('submit', submit);
+
+      // 비즈메시지 개발자 보유 여부 변경 시 즉시 검증
+      Array.from(document.querySelectorAll('input[name="has_api_dev"]'))
+        .forEach(i => i.addEventListener('change', validateStep1));
+
+      // 초기화
+      setDefaultFromUTM();
+      updateBiztingOptions();
+      validateStep1();
+    })();
+  </script>
+</body>
+
+</html>
