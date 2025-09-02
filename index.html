@@ -411,6 +411,20 @@
             </div>
           </div>
 
+          <!-- 비즈메시지 선택 시 선택(옵션): 의료산업 선택 분기 -->
+          <div id="medicalOrg" class="hidden" style="margin-top:8px;">
+            <div class="desc"><strong>선택</strong> — 도입하는 곳이 병·의원인가요?</div>
+            <div class="row single" style="margin-top:8px;">
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="radio" name="is_medical_org" value="Y" /> 병·의원입니다
+              </label>
+              <label style="display:flex; gap:8px; align-items:center;">
+                <input type="radio" name="is_medical_org" value="N" /> 아닙니다
+              </label>
+            </div>
+            <div class="help">선택 시 ‘의료산업 마케팅’ 서비스가 자동 선택됩니다.</div>
+          </div>
+
           <!-- 비즈팅 선택 시에만 노출되는 관심사 (선택) -->
           <div id="biztingOptions" class="hidden" style="margin-top:12px;">
             <div class="desc"><strong>선택</strong> — 지금 당장 필요하지 않으면 넘어가셔도 됩니다.</div>
@@ -454,6 +468,9 @@
                 </label>
                 <label class="chip">
                   <input type="checkbox" name="also_bizting" value="Y"> 비즈팅
+                </label>
+                <label class="chip">
+                  <input type="checkbox" name="also_medical" value="Y"> 의료산업 마케팅
                 </label>
               </div>
               <!-- 선택한 추가 서비스 설명 영역 -->
@@ -555,14 +572,16 @@
         bizmessage: '비즈메시지',
         chatbot: '챗봇',
         signup: '간편가입',
-        bizting: '비즈팅'
+        bizting: '비즈팅',
+        medical: '의료산업 마케팅'
       };
 
       const SERVICE_DESC = {
         bizmessage: '카카오 알림톡/브랜드 메시지/문자/네이버 메시지 발송',
         chatbot: '주문·배송·환불·서비스 안내 등 자동응답',
         signup: '카카오싱크/네이버 로그인 연동',
-        bizting: '통신사/카드사/포인트사 회원 정보 기반 신규 고객 유치용 타겟 광고 문자 발송'
+        bizting: '통신사/카드사/포인트사 회원 정보 기반 신규 고객 유치용 타겟 광고 문자 발송',
+        medical: '병·의원 대상 알림톡 자동 발송 및 신규 환자 유치·재진 활성화 마케팅'
       };
 
       const el = {
@@ -587,6 +606,7 @@
         submit_error: document.getElementById('submit_error'),
         submitBtn: document.getElementById('submitBtn'),
         selected_service: document.getElementById('selected_service'),
+        medicalOrg: document.getElementById('medicalOrg'),
         utm: {
           source: document.getElementById('utm_source'),
           medium: document.getElementById('utm_medium'),
@@ -633,11 +653,24 @@
 
         // 비즈메시지: 개발자 보유 여부 토글
         el.bizmessageDev.classList.toggle('hidden', !isBizmsg);
+
+        // 비즈메시지: 병·의원 여부 토글
+        if (el.medicalOrg) el.medicalOrg.classList.toggle('hidden', !isBizmsg);
+
         if (!isBizmsg) {
+          // 상태 초기화
           const d1 = document.querySelector('input[name="has_api_dev"][value="Y"]');
           const d2 = document.querySelector('input[name="has_api_dev"][value="N"]');
           if (d1) d1.checked = false;
           if (d2) d2.checked = false;
+
+          const m1 = document.querySelector('input[name="is_medical_org"][value="Y"]');
+          const m2 = document.querySelector('input[name="is_medical_org"][value="N"]');
+          if (m1) m1.checked = false;
+          if (m2) m2.checked = false;
+
+          const medChip = document.querySelector('input[name="also_medical"]');
+          if (medChip) medChip.checked = false;
         }
       }
 
@@ -718,12 +751,19 @@
             + `<li>온보드 마케팅: ${pretty(onboard)}</li>`
             + '</ul>';
         }
+
+        // 비즈메시지 선택 > 개발자 보유여부, 병·의원 선택이면 확인 문구에 표시
         if (svc === 'bizmessage') {
           const dev = document.querySelector('input[name="has_api_dev"]:checked')?.value;
           if (dev) {
             html += `<div class="hint" style="margin-top:6px;">개발자 보유 여부: ${dev === 'Y' ? '있습니다' : '없습니다'}</div>`;
           }
+          const isMed = document.querySelector('input[name="is_medical_org"]:checked')?.value === 'Y';
+          if (isMed) {
+            html += `<div class="hint" style="margin-top:6px;">산업: 병·의원 — ‘의료산업 마케팅’ 자동 선택</div>`;
+          }
         }
+
         el.confirmText.innerHTML = html;
         show(el.step1_5);
 
@@ -753,6 +793,10 @@
               lbl.style.display = 'inline-flex';
             }
           });
+          // 병·의원 선택이면 의료산업 마케팅 칩 자동 체크
+          const isMed = document.querySelector('input[name="is_medical_org"]:checked')?.value === 'Y';
+          const medCb = document.querySelector('#extraChips input[name="also_medical"]');
+          if (medCb) medCb.checked = isMed;
         })();
         syncExtraDesc();
       }
@@ -763,7 +807,8 @@
           ['also_bizmessage', 'bizmessage'],
           ['also_chatbot', 'chatbot'],
           ['also_signup', 'signup'],
-          ['also_bizting', 'bizting']
+          ['also_bizting', 'bizting'],
+          ['also_medical', 'medical']
         ];
         const sel = [];
         pairs.forEach(([name, key]) => {
@@ -802,7 +847,8 @@
         data.also_chatbot = (formData.get('also_chatbot') ? 'Y' : 'N');
         data.also_signup = (formData.get('also_signup') ? 'Y' : 'N');
         data.also_bizting = (formData.get('also_bizting') ? 'Y' : 'N');
-
+        data.is_medical_org = formData.get('is_medical_org') || '';
+        data.also_medical = (formData.get('also_medical') ? 'Y' : 'N');
         return data;
       }
 
