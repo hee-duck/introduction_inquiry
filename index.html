@@ -234,6 +234,62 @@
       margin: 0;
     }
 
+    /* 추가 관심 섹션 전체는 블록 흐름 */
+    #extraBox {
+      display: block;
+    }
+
+    /* 칩은 가로로 배치하되 줄바꿈 허용 */
+    #extraChips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 설명 박스는 항상 칩 아래에 세로로 */
+    .extra-desc {
+      display: block;
+      /* 가로 플렉스 영향 차단 */
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px;
+      background: #f9fafb;
+    }
+
+    /* 설명 항목은 세로 스택 */
+    .extra-desc .item {
+      display: block;
+      font-size: 13px;
+      color: #374151;
+      margin: 4px 0;
+    }
+
+    .extra-desc .item strong {
+      color: #111827;
+    }
+
+
+    /* 추가 관심 서비스 설명 */
+    .extra-desc {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--border, #e5e7eb);
+      border-radius: 10px;
+      background: #f9fafb;
+    }
+
+    .extra-desc .item {
+      font-size: 13px;
+      color: #374151;
+      margin: 4px 0;
+    }
+
+    .extra-desc .item strong {
+      color: #111827;
+    }
+
+
 
     /* 개인정보 수집 동의 블록 — 전체 톤 맞춤 */
     .counsel-agree {
@@ -383,7 +439,8 @@
 
           <!-- 1.5단계: 추가 관심 서비스 (선택, 비차단) -->
           <div id="extraInterest" class="optional-block">
-            <button type="button" id="toggleExtra" class="linklike" style="color: cornflowerblue;">다른 서비스도 관심 있어요</button>
+            <button type="button" id="toggleExtra" class="linklike" style="color: cornflowerblue;">다른 서비스도 관심
+              있어요</button>
             <div id="extraBox" class="hidden" aria-hidden="true">
               <div class="chip-group" id="extraChips">
                 <label class="chip">
@@ -399,6 +456,8 @@
                   <input type="checkbox" name="also_bizting" value="Y"> 비즈팅
                 </label>
               </div>
+              <!-- 선택한 추가 서비스 설명 영역 -->
+              <div id="extraDesc" class="extra-desc hidden" aria-live="polite"></div>
               <div class="help">선택하지 않아도 바로 다음 단계로 진행할 수 있어요.</div>
             </div>
           </div>
@@ -695,7 +754,36 @@
             }
           });
         })();
+        syncExtraDesc();
+      }
 
+      // 추가 선택 서비스 부가 설명
+      function syncExtraDesc() {
+        const pairs = [
+          ['also_bizmessage', 'bizmessage'],
+          ['also_chatbot', 'chatbot'],
+          ['also_signup', 'signup'],
+          ['also_bizting', 'bizting']
+        ];
+        const sel = [];
+        pairs.forEach(([name, key]) => {
+          const cb = document.querySelector(`input[name="${name}"]`);
+          if (cb && cb.checked) sel.push(key);
+        });
+
+        const box = document.getElementById('extraDesc');
+        if (!box) return;
+
+        if (sel.length === 0) {
+          box.classList.add('hidden');
+          box.innerHTML = '';
+          return;
+        }
+
+        box.classList.remove('hidden');
+        box.innerHTML = sel.map(k =>
+          `<div class="item"><strong>${SERVICES[k]}</strong> — ${SERVICE_DESC[k] || ''}</div>`
+        ).join('');
       }
 
       function toStep2() { show(el.step2); }
@@ -771,6 +859,12 @@
       el.email.addEventListener('input', syncContactValidation);
       el.phone.addEventListener('input', syncContactValidation);
       el.form.addEventListener('submit', submit);
+
+      // 추가 관심 서비스 체크 변화 시 설명 동기화
+      document.querySelectorAll('#extraChips input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', syncExtraDesc);
+      });
+
 
       // 1.5단계: ‘다른 서비스도 관심 있어요’ 토글
       const toggleExtraBtn = document.getElementById('toggleExtra');
